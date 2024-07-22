@@ -1,30 +1,16 @@
-// components/Drawer.js
-// export default function Drawer({ isOpen, setIsOpen, toggleDrawer }) {
-// components/Drawer.js
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
 
 export default function Drawer({ isOpen, setIsOpen, toggleDrawer }) {
-  // const [isOpen, setIsOpen] = useState(false);
   const drawerRef = useRef();
   const closeButtonRef = useRef();
 
-  // const toggleDrawer = () => {
-  //   setIsOpen(!isOpen);
-  // };
-
-  const closeDrawer = () => {
+  const closeDrawer = useCallback(() => {
     setIsOpen(false);
-  };
-
-  const handleKeyDown = (event) => {
-    if (event.key === "Escape") {
-      closeDrawer();
-    }
-  };
+  }, [setIsOpen]);
 
   const handleButtonKeyDown = (event) => {
     if (event.key === " " || event.key === "Enter") {
-      event.preventDefault(); // Empêche le focus de changer au parent
+      event.preventDefault();
       closeDrawer();
     }
   };
@@ -51,6 +37,13 @@ export default function Drawer({ isOpen, setIsOpen, toggleDrawer }) {
 
   useEffect(() => {
     const currentRef = drawerRef.current;
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        closeDrawer();
+      }
+    };
+
     if (isOpen) {
       closeButtonRef.current.focus();
       window.addEventListener("keydown", handleKeyDown);
@@ -64,19 +57,10 @@ export default function Drawer({ isOpen, setIsOpen, toggleDrawer }) {
       window.removeEventListener("keydown", handleKeyDown);
       currentRef?.removeEventListener("keydown", trapFocus);
     };
-  }, [isOpen, handleKeyDown]);
+  }, [isOpen, closeDrawer]);
 
   return (
     <>
-      <button
-        onClick={toggleDrawer}
-        className="p-2 bg-blue-500 text-white rounded"
-        aria-controls="drawer"
-        aria-expanded={isOpen}
-      >
-        {isOpen ? "Close Drawer" : "Open Drawer"}
-      </button>
-
       {/* Backdrop */}
       {isOpen && (
         <div
